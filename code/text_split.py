@@ -103,7 +103,7 @@ def _token_seg_main():
 
     df = pd.DataFrame({'file_type': file_type, 'file_names': file_names, 'key_words': key_words})
     df.to_csv('../data/tocken_result1.csv', index=False)
-    print(df)
+    # print(df)
 
 
 if __name__ == '__main__':
