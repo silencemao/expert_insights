@@ -24,21 +24,33 @@ def read_docx(file_path):
     return '\n'.join(content)
 
 
+def remove_stop_word(matrix, array):
+    result_matrix = [[element for element in row if element not in array] for row in matrix]
+    return result_matrix
+
+
 def tokenize_doc(doc_content, method='jieba'):
+    # 分词、去除停用词
+    data = open('../data/中文停用词库.txt', 'r').readlines()
+    stop_words = [word.strip() for word in data]
+
     if method == 'jieba':
         # 使用精确模式分词
         words = jieba.cut(doc_content, cut_all=False)
         # 过滤掉无关字符（空格、回车等）
-        words = [word.strip() for word in words if word.strip()]
-        # 将分词结果拼接为字符串
-        result = " ".join(words)
     else:
         tok_fine = hanlp.load(hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH)
         words = tok_fine(doc_content)
-        result = " ".join(words)
-
         # print("直接提取关键词的结果 ", HanLP.extractKeyword(doc_content, 5))
 
+    print('分词之后 ', words)
+    words = [word.strip() for word in words if word.strip()]
+
+    intersection = set(words).intersection(stop_words)
+    result = [word for word in words if word not in intersection]
+    print('去除停用 ', result)
+
+    result = " ".join(result)
     return result
 
 
@@ -65,13 +77,20 @@ def calculate_tfidf(doc_content_seg):
     return ",".join(top_n_keywords)
 
 
-def _get_title_key_words(file_names):
+def _get_title_key_words(titles):
     # 假设有多篇文章的标题
 
-    titles = file_names
+    # 分词、去除停用词
+    data = open('../data/中文停用词库.txt', 'r').readlines()
+    stop_words = [word.strip() for word in data]
 
     # 分词并抽取关键词
     tokenized_titles = [" ".join(jieba.cut(title)) for title in titles]
+
+    words = [title.split(' ') for title in tokenized_titles]
+    words = remove_stop_word(words, stop_words)
+    tokenized_titles = [" ".join(item) for item in words]
+    print('恢复格式 ', tokenized_titles)
 
     # 使用 TF-IDF 计算每个词的重要性
     vectorizer = TfidfVectorizer(use_idf=True)
@@ -127,7 +146,6 @@ def _token_seg_main():
             doc_content = read_docx(file_path)
 
             doc_content_seg = tokenize_doc(doc_content, method='hanlp')
-            # print('分词完毕', doc_content_seg)
             print('计算tf-idf')
             top_n_keywords = calculate_tfidf(doc_content_seg)
 
@@ -137,6 +155,7 @@ def _token_seg_main():
             key_words.append(top_n_keywords)
             print("=" * 10, " done")
 
+    # 稳藏关键词提取
     title_key_word_df = _get_title_key_words(file_names)
     print(title_key_word_df)
 
@@ -192,8 +211,14 @@ def _word2vec_():
                 word_vec.append(wv_from_text[word].tolist())
         print(word_vec)
 
-
+'''
+1、分词、抽取关键词
+2、构建词向量  -》 构建文章向量 向量拼接 or 均值 or 叠加
+3、文章相似度  -》 向量相似度？
+4、作者抽取 -》 需要调研 
+5、
+'''
 if __name__ == '__main__':
-    # _token_seg_main()
-    _word2vec_()
+    _token_seg_main()
+    # _word2vec_()
     # _transfer_word2vec_format_()

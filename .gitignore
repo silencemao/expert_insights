@@ -1,5 +1,7 @@
-./data/*
+./data
 .DS_Store
 .idea/
 ./weight/*
-
+__pycache__/
+cfg.py
+./weight
