@@ -18,17 +18,26 @@ print(user_base_df)
 user_base_df.to_csv('../data/base_info/user_base_info.csv', index=False)
 
 
+def generate_random_chinese(length):
+    result = ''
+    for _ in range(length):
+        # 生成一个随机的unicode编码，范围在19968到40869之间（汉字的unicode编码范围）
+        char = chr(random.randint(19968, 40869))
+        result += char
+    return result
+
+
 def generate_reward_info():
     user_num = user_base_df['id']
     years = ['2021', '2022', '2023']
     reward = {
         'id': [], 'reward_name': [], 'reward_type': [], 'reward_class': [], 'finish_order': [], 'max_order': [],
-        'reward_year': []
+        'finish_year': []
     }
     for year in years:
         for user in user_num:
-            reward['reward_year'].append(year)
-            reward['reward_name'].append('')
+            reward['finish_year'].append(year)
+            reward['reward_name'].append(generate_random_chinese(random.randint(5, 16)))
             reward['id'].append(user)
             reward['reward_type'].append(random.randint(0, 2))
             reward['reward_class'].append(random.randint(0, 2))
@@ -46,12 +55,12 @@ def generate_patent_info():
     user_num = user_base_df['id']
     years = ['2019', '2020', '2021', '2022', '2023']
     patent = {
-        'id': [], 'patent_name': [], 'patent_type': [], 'is_auth': [], 'finish_order': [], 'max_order': [], 'auth_year': []
+        'id': [], 'patent_name': [], 'patent_type': [], 'is_auth': [], 'finish_order': [], 'max_order': [], 'finish_year': []
     }
     for year in years:
         for user in user_num:
             patent['id'].append(user)
-            patent['patent_name'].append('')
+            patent['patent_name'].append(generate_random_chinese(random.randint(5, 16)))
             patent['patent_type'].append(random.randint(0, 1))
 
             finish_order = random.randint(1, 20)
@@ -59,7 +68,7 @@ def generate_patent_info():
             patent['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 20)), 20))
 
             patent['is_auth'].append(random.randint(0, 1))
-            patent['auth_year'].append(year)
+            patent['finish_year'].append(year)
 
     patent_df = pd.DataFrame(patent)
     print(patent_df)
@@ -77,7 +86,7 @@ def generate_book_info():
     for year in years:
         for user in user_num:
             book['id'].append(user)
-            book['book_name'].append('')
+            book['book_name'].append(generate_random_chinese(random.randint(5, 16)))
             book['book_type'].append(random.randint(0, 1))
             book['publish_type'].append(random.randint(1, 1))
 
@@ -102,7 +111,7 @@ def generate_paper_info():
     for year in years:
         for user in user_num:
             paper['id'].append(user)
-            paper['paper_name'].append('')
+            paper['paper_name'].append(generate_random_chinese(random.randint(5, 16)))
             paper['paper_type'].append(random.randint(0, 2))
 
             finish_order = random.randint(1, 6)
@@ -117,9 +126,9 @@ def generate_paper_info():
 
 
 if __name__ == '__main__':
-    # generate_reward_info()
-    # generate_patent_info()
-    # generate_book_info()
+    generate_reward_info()
+    generate_patent_info()
+    generate_book_info()
     generate_paper_info()
 
 
