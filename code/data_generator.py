@@ -22,7 +22,8 @@ def generate_reward_info():
     user_num = user_base_df['id']
     years = ['2021', '2022', '2023']
     reward = {
-        'id': [], 'reward_name': [], 'reward_type': [], 'reward_class': [], 'finish_order': [], 'reward_year': []
+        'id': [], 'reward_name': [], 'reward_type': [], 'reward_class': [], 'finish_order': [], 'max_order': [],
+        'reward_year': []
     }
     for year in years:
         for user in user_num:
@@ -31,7 +32,10 @@ def generate_reward_info():
             reward['id'].append(user)
             reward['reward_type'].append(random.randint(0, 2))
             reward['reward_class'].append(random.randint(0, 2))
-            reward['finish_order'].append(random.randint(1, 100))
+
+            finish_order = random.randint(1, 20)
+            reward['finish_order'].append(finish_order)
+            reward['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 20)), 20))
     reward_df = pd.DataFrame(reward)
     print(reward_df)
     reward_df.to_csv('../data/base_info/reward_info.csv', index=False)
@@ -101,9 +105,9 @@ def generate_paper_info():
 
 if __name__ == '__main__':
     generate_reward_info()
-    generate_patent_info()
-    generate_book_info()
-    generate_paper_info()
+    # generate_patent_info()
+    # generate_book_info()
+    # generate_paper_info()
 
 
 
