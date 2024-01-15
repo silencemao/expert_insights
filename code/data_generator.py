@@ -46,14 +46,18 @@ def generate_patent_info():
     user_num = user_base_df['id']
     years = ['2019', '2020', '2021', '2022', '2023']
     patent = {
-        'id': [], 'patent_name': [], 'patent_type': [], 'is_auth': [], 'finish_order': [], 'auth_year': []
+        'id': [], 'patent_name': [], 'patent_type': [], 'is_auth': [], 'finish_order': [], 'max_order': [], 'auth_year': []
     }
     for year in years:
         for user in user_num:
             patent['id'].append(user)
             patent['patent_name'].append('')
             patent['patent_type'].append(random.randint(0, 1))
-            patent['finish_order'].append(random.randint(1, 100))
+
+            finish_order = random.randint(1, 20)
+            patent['finish_order'].append(finish_order)
+            patent['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 20)), 20))
+
             patent['is_auth'].append(random.randint(0, 1))
             patent['auth_year'].append(year)
 
@@ -67,15 +71,20 @@ def generate_book_info():
     user_num = user_base_df['id']
     years = ['2019', '2020', '2021', '2022', '2023']
     book = {
-        'id': [], 'book_name': [], 'book_type': [], 'publish_type': [], 'finish_order': [], 'finish_year': []
+        'id': [], 'book_name': [], 'book_type': [], 'publish_type': [], 'finish_order': [], 'max_order': [],
+           'finish_year': []
     }
     for year in years:
         for user in user_num:
             book['id'].append(user)
             book['book_name'].append('')
-            book['book_type'].append(random.randint(0, 2))
+            book['book_type'].append(random.randint(0, 1))
             book['publish_type'].append(random.randint(1, 1))
-            book['finish_order'].append(random.randint(0, 100))
+
+            finish_order = random.randint(1, 20)
+            book['finish_order'].append(finish_order)
+            book['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 20)), 20))
+
             book['finish_year'].append(year)
 
     book_df = pd.DataFrame(book)
@@ -88,14 +97,18 @@ def generate_paper_info():
     user_num = user_base_df['id']
     years = ['2019', '2020', '2021', '2022', '2023']
     paper = {
-        'id': [], 'paper_name': [], 'paper_type': [], 'finish_order': [], 'finish_year': []
+        'id': [], 'paper_name': [], 'paper_type': [], 'finish_order': [], 'max_order': [], 'finish_year': []
     }
     for year in years:
         for user in user_num:
             paper['id'].append(user)
             paper['paper_name'].append('')
             paper['paper_type'].append(random.randint(0, 2))
-            paper['finish_order'].append(random.randint(0, 6))
+
+            finish_order = random.randint(1, 6)
+            paper['finish_order'].append(finish_order)
+            paper['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 6)), 6))
+
             paper['finish_year'].append(year)
 
     paper_df = pd.DataFrame(paper)
@@ -104,10 +117,10 @@ def generate_paper_info():
 
 
 if __name__ == '__main__':
-    generate_reward_info()
+    # generate_reward_info()
     # generate_patent_info()
     # generate_book_info()
-    # generate_paper_info()
+    generate_paper_info()
 
 
 
