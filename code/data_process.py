@@ -120,18 +120,18 @@ def _author_split():
 
     # 重新设置索引
     df = df.reset_index(drop=True)
-    # print(df[:10])
-
-    cols = ['paper_id', 'paper_name', 'author_name', 'author_order', 'author_company', 'journal_name', 'journal_class',
-            'journal_class1', 'pub_year']
-    df[cols].to_csv('../data/paper_author_rela.csv', index=False)
 
     author_df = df[['author_name']].drop_duplicates()
     author_df['author_id'] = (author_df.index + 1).astype(str).str.zfill(8)
     print(author_df.columns)
     author_df[['author_id', 'author_name']].to_csv('../data/author_id.csv', index=False)
 
+    res_df = pd.merge(df, author_df, on=['author_name'], how='left')
+    cols = ['paper_id', 'paper_name', 'author_name', 'author_order', 'author_id', 'author_company', 'journal_name',
+            'journal_class', 'journal_class1', 'pub_year']
+    res_df[cols].to_csv('../data/paper_author_rela.csv', index=False)
+
 
 if __name__ == '__main__':
-    _paper_process_()
-    # _author_split()
+    # _paper_process_()
+    _author_split()
