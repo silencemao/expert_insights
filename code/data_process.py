@@ -87,6 +87,7 @@ def _paper_process_():
     df['pub_year'] = ((df['pub_date'].dt.year.fillna(df['register_date'])).fillna(0).astype(int)).astype(str)
 
     df['author_name'] = df['author_name'].str.replace(r'[^\w\s\u4e00-\u9fff]', ' ')  # 用空格替换除了字母、数字、空格和中文字符之外的字符
+    df['author_name'] = df['author_name'].str.replace(r'[a-zA-Z]', '')  # 去除字母
     df['author_name'] = df['author_name'].str.replace(r'\d', '')  # 去除数字
     df['author_name'] = df['author_name'].str.replace(r'\s+', ' ')  # 将多个空格替换为一个空格
     df['author_name'] = df['author_name'].str.strip()  # 去除开头和结尾的空格
