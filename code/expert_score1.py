@@ -4,6 +4,7 @@ from score_cfg import reward_type_cfg, patent_type_cfg, paper_type_cfg, book_typ
 pd.set_option('display.max_columns', None)
 
 
+# 第一版规则计算分数
 def _read_data():
     user_base_df = pd.read_csv('../data/base_info/user_base_info.csv')
     patent_df = pd.read_csv('../data/base_info/patent_info.csv')
