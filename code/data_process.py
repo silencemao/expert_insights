@@ -134,5 +134,5 @@ def _author_split():
 
 
 if __name__ == '__main__':
-    # _paper_process_()
+    _paper_process_()
     _author_split()
