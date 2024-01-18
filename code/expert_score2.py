@@ -11,6 +11,10 @@ def _read_data():
     return paper_author_rela_df
 
 
+paper_author_rela_df = _read_data()
+paper_key_word_df = pd.read_csv('../data/paper_key_word.csv')
+
+
 def _score_func(finish_order, max_order, base_score, divid_score):
     if max_order == 1:
         return 1
@@ -47,16 +51,45 @@ def _paper_score(paper_df):
 
     author_score_df['author_rank'] = (author_score_df.index + 1).astype(str)
 
-    print(author_score_df[:5])
+    # print(author_score_df[:5])
     print(author_score_df.columns)
     return author_score_df[['author_id', 'author_name',  'author_score_sum',  'author_paper_cnt', 'author_rank']]
     # return paper_df[['paper_id', 'paper_name', 'author_id', 'author_name', 'paper_score', 'pub_year']]
 
 
+def _get_author_info(author_id):
+
+    res_df = paper_author_rela_df[paper_author_rela_df['author_id'] == author_id]
+    cols = ['author_id', 'author_name', 'paper_id', 'paper_name', 'author_order', 'journal_name', 'pub_year']
+    res_df = res_df[cols]
+
+    paper_key_word_df = pd.read_csv('../data/paper_key_word.csv')
+
+    res_df = pd.merge(res_df, paper_key_word_df, on=['paper_id', 'paper_name'], how='left')
+    res_df = res_df.sort_values(by=['pub_year'], ascending=[False])
+    res_df = res_df.drop(columns=['pub_year', 'paper_id'])
+    print(res_df[:5])
+    return res_df
+
+
+def _get_author_key_word(author_id):
+    paper_ids_df = paper_author_rela_df[paper_author_rela_df['author_id'] == author_id][['paper_id', 'author_id', 'author_name']]
+    res_df = pd.merge(paper_ids_df, paper_key_word_df, on=['paper_id'], how='left')
+
+    key_words = res_df['key_word'].tolist()
+    key_words = [words.split(',') for words in key_words]
+    key_words = list(set([word for words in key_words for word in words]))
+
+    key_words.insert(0, res_df['author_name'].tolist()[0])
+    print(key_words)
+    return key_words
+
+
 def _main():
-    paper_author_rela_df = _read_data()
     return _paper_score(paper_author_rela_df)
 
 
 if __name__ == '__main__':
     _main()
+    # _get_author_info('00000011')
+    _get_author_key_word('00000011')
