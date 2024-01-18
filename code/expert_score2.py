@@ -38,16 +38,25 @@ def _paper_score(paper_df):
     # print(paper_score)
     paper_df['paper_score'] = paper_score
     print(paper_df.columns)
-
     # print(paper_df[['paper_id', 'paper_name', 'author_id', 'author_name', 'paper_score', 'pub_year']][10:20])
 
     author_score_df = paper_df.groupby(['author_id', 'author_name']).agg(author_score_sum=('paper_score', 'sum'),
                                                           author_paper_cnt=('paper_id', 'count')).reset_index()
-    author_score_df = author_score_df.sort_values(by=['author_score_sum', 'author_paper_cnt'], ascending=[False, False])
-    print(author_score_df[:50])
-    return paper_df[['paper_id', 'paper_name', 'author_id', 'author_name', 'paper_score', 'pub_year']]
+    author_score_df['author_score_sum'] = author_score_df['author_score_sum'].round(1)
+    author_score_df = author_score_df.sort_values(by=['author_score_sum', 'author_paper_cnt'], ascending=[False, False]).reset_index(drop=True)
+
+    author_score_df['author_rank'] = (author_score_df.index + 1).astype(str)
+
+    print(author_score_df[:5])
+    print(author_score_df.columns)
+    return author_score_df[['author_id', 'author_name',  'author_score_sum',  'author_paper_cnt', 'author_rank']]
+    # return paper_df[['paper_id', 'paper_name', 'author_id', 'author_name', 'paper_score', 'pub_year']]
+
+
+def _main():
+    paper_author_rela_df = _read_data()
+    return _paper_score(paper_author_rela_df)
 
 
 if __name__ == '__main__':
-    paper_author_rela_df = _read_data()
-    _paper_score(paper_author_rela_df)
+    _main()
