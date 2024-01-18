@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>专家个人信息</title>
+    <style>
+        th, td {
+            text-align: center;
+        }
+        .button {
+<!--            display: inline-block;-->
+            display: flex;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>专家个人信息</h1>
+<!--        <div>-->
+<!--            <button class="button" onclick="showPapers()">论文</button>-->
+<!--            <button class="button" onclick="showPatents()">专利</button>-->
+<!--&lt;!&ndash;            <button class="button" onclick="showProfile()">个人画像</button>&ndash;&gt;-->
+
+<!--            <form action="/get_author_profile_info" method="post">-->
+<!--                <input type="submit" class="button" value="个人画像">-->
+<!--            </form>-->
+<!--        </div>-->
+
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for col in data[0].keys() %}
+                    <th>{{ col | center }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    {% for key, value in row.items() %}
+                        {% if key == 'paper_name' %}
+                            <td><a href="/author_info/{{ row['paper_id'] }}">{{ row['paper_name'] }}</a></td>
+                        {% elif key == 'author_name' %}
+                            <td><a href="/author_profile/{{ row['author_id'] }}">{{ row['author_name'] }}</a></td>
+                        {% else %}
+                            <td>{{ value }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

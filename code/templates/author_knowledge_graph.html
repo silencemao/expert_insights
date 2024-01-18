@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author and Keywords Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        text {
+            font: 19px 'Microsoft YaHei', sans-serif; /* 指定中文字体 */
+        }
+    </style>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <svg></svg>
+
+    <script>
+        var author = "{{ author }}";
+        var keywords = {{ keywords | tojson }};
+
+        var colors = d3.scaleOrdinal(d3.schemeCategory10); // 使用D3内置的颜色比例尺来为关键词设置不同的颜色
+
+        var screenWidth = window.innerWidth * 5 / 6;
+        var screenHeight = window.innerHeight * 5 / 6;
+
+        var svg = d3.select("svg")
+            .attr("width", screenWidth)
+            .attr("height", screenHeight);
+
+        var radius = Math.min(screenWidth, screenHeight) / 3;
+
+        var texts = svg.selectAll("text")
+            .data([author, ...keywords])
+            .enter()
+            .append("text")
+            .text(function(d) { return d; })
+            .attr("x", screenWidth / 2)
+            .attr("y", screenHeight / 2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("font-size", function(d, i) { return i === 0 ? "36px" : "32px"; })
+            .attr("fill", function(d, i) { return i === 0 ? "blue" : colors(i); }); // 设置作者为蓝色，关键词为不同的颜色
+
+        var angle = 0;
+
+        d3.interval(function() {
+            angle += 0.01;
+            texts.attr("x", function(d, i) {
+                if (i > 0) {
+                    return screenWidth / 2  + radius * Math.cos(angle + i * (Math.PI * 2 / keywords.length));
+                } else {
+                    return screenWidth / 2;
+                }
+            })
+            .attr("y", function(d, i) {
+                if (i > 0) {
+                    return screenHeight / 2 + radius * Math.sin(angle + i * (Math.PI * 2 / keywords.length));
+<!--                    return screenHeight / 2 + (radius + Math.random() * 20) * Math.sin(angle + i * (Math.PI * 2 / keywords.length));-->
+                } else {
+                    return screenHeight / 2;
+                }
+            });
+
+<!--            // 添加连线-->
+<!--            svg.selectAll("line")-->
+<!--                .data(keywords)-->
+<!--                .join("line")-->
+<!--                .attr("x1", screenWidth / 2)-->
+<!--                .attr("y1", screenHeight / 2)-->
+<!--                .attr("x2", (d, i) => screenWidth / 2 + radius * Math.cos(angle + (i + 1) * (Math.PI * 2 / keywords.length)))-->
+<!--                .attr("y2", (d, i) => screenHeight / 2 + radius * Math.sin(angle + (i + 1) * (Math.PI * 2 / keywords.length)))-->
+<!--                .attr("stroke", "gray")-->
+<!--                .attr("stroke-width", 1);-->
+
+            svg.selectAll("line")
+                .data(keywords)
+                .join("line")
+                .attr("x1", screenWidth / 2)
+                .attr("y1", screenHeight / 2)
+                .attr("x2", (d, i) => screenWidth / 2 + radius * Math.cos(angle + (i + 1) * (Math.PI * 2 / keywords.length)))
+                .attr("y2", (d, i) => screenHeight / 2 + radius * Math.sin(angle + (i + 1) * (Math.PI * 2 / keywords.length)))
+                .attr("stroke", "gray")
+                .attr("stroke-width", 1);
+
+            // 添加作者文本
+            svg.append("text")
+                .text(author)
+                .attr("x", screenWidth / 2)
+                .attr("y", screenHeight / 2 - 10) // 将作者文本上移一些，以避免被连线覆盖
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("font-size", "26px")
+                .attr("fill", "blue");
+
+        }, 50);
+    </script>
+</body>
+</html>
