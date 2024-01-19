@@ -2,6 +2,7 @@ import pandas as pd
 import jieba
 import hanlp
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 
@@ -73,7 +74,6 @@ def _paper_process_():
     df['paper_name'] = df['paper_name'].apply(lambda x: x.strip())
     df['paper_id'] = 'lw' + (df.index + 1).astype(str).str.zfill(8)
 
-    # 自定义函数
     def label_text(text):
         if 'SCI' in text:
             return 0
@@ -98,17 +98,21 @@ def _paper_process_():
     # 题目提取关键词
     paper_key_word_df = _get_title_key_words(df)
     print(paper_key_word_df[:5])
-    # print(paper_key_word_df.to_csv('../data/paper_key_word.csv', index=False))
+    print(paper_key_word_df.to_csv('../data/paper_key_word.csv', index=False))
 
-    cols = ['paper_id', 'paper_name', 'author_name', 'author_company', 'journal_name', 'journal_class', 'journal_class1',
+    cols = ['paper_id', 'paper_name', 'author_name', 'author_company', 'journal_name', 'journal_class',
+            'journal_class1',
             'pub_year']
     print(df[cols])
-    # df[cols].to_csv('../data/paper_format.csv', index=False)
+    df[cols].to_csv('../data/paper_format.csv', index=False)
 
 
 def _paper_author_split():
     # 1、在paper_format的基础上，将一篇文章的人名拆分成多个，构建论文-作者的关系，并标记作者排序 -》paper_author_rela
     # 2、将所有作者抽取出俩，去重 然后作者编号 -》author_id
+
+    author_df = pd.read_csv('../data/author_id.csv', dtype={'author_id': str})
+
     df = pd.read_csv('../data/paper_format.csv')
 
     df['author_name'] = df['author_name'].str.split(' ')
@@ -122,14 +126,16 @@ def _paper_author_split():
     # 重新设置索引
     df = df.reset_index(drop=True)
 
-    author_df = df[['author_name']].drop_duplicates()
-    author_df['author_id'] = (author_df.index + 1).astype(str).str.zfill(8)
-    print(author_df.columns)
-    author_df[['author_id', 'author_name']].to_csv('../data/author_id.csv', index=False)
+    # author_df = df[['author_name']].drop_duplicates()
+    # author_df['author_id'] = (author_df.index + 1).astype(str).str.zfill(8)
+    # print(author_df.columns)
+    # author_df[['author_id', 'author_name']].to_csv('../data/author_id.csv', index=False)
 
     res_df = pd.merge(df, author_df, on=['author_name'], how='left')
     cols = ['paper_id', 'paper_name', 'author_name', 'author_order', 'author_id', 'author_company', 'journal_name',
             'journal_class', 'journal_class1', 'pub_year']
+
+    print(res_df[cols][:20])
     res_df[cols].to_csv('../data/paper_author_rela.csv', index=False)
 
 
@@ -157,6 +163,7 @@ def _patent_process_():
             return 1
         else:
             return 2
+
     df['patent_class'] = df['patent_type'].apply(lambda x: label_text(x))
 
     df['apply_year'] = pd.to_datetime(df['apply_date'], errors='coerce').dt.year.astype(str)
@@ -187,8 +194,9 @@ def _patent_process_():
 def _patent_author_split():
     # 1、在paper_format的基础上，将一篇文章的人名拆分成多个，构建论文-作者的关系，并标记作者排序 -》paper_author_rela
     # 2、将所有作者抽取出来，去重 然后作者编号 -》author_id
+    author_df = pd.read_csv('../data/author_id.csv', dtype={'author_id': str})
+
     df = pd.read_csv('../data/patent_format.csv')
-    paper_author_df = pd.read_csv('../data/author_id.csv')
 
     df['author_name'] = df['author_name'].str.split(' ')
 
@@ -201,20 +209,12 @@ def _patent_author_split():
     # 重新设置索引
     df = df.reset_index(drop=True)
 
-    author_df = df[['author_name']].drop_duplicates()
+    res_df = pd.merge(df, author_df, on=['author_name'], how='left')
+    print(res_df.columns)
 
-    res_author_df = pd.merge(paper_author_df, author_df, on=['author_name'], how='left')
-    print(res_author_df)
-
-    # author_df['author_id'] = (author_df.index + 1).astype(str).str.zfill(8)
-
-    # print(author_df.columns)
-    # author_df[['author_id', 'author_name']].to_csv('../data/patent_author_id.csv', index=False)
-    #
-    # res_df = pd.merge(df, author_df, on=['author_name'], how='left')
-    # cols = ['paper_id', 'paper_name', 'author_name', 'author_order', 'author_id', 'author_company', 'journal_name',
-    #         'journal_class', 'journal_class1', 'pub_year']
-    # res_df[cols].to_csv('../data/patent_author_rela.csv', index=False)
+    cols = ['patent_id', 'patent_name', 'author_name', 'author_order', 'author_id', 'patent_type', 'patent_class',
+            'apply_date', 'apply_id', 'second_tech_area', 'core_business_area', 'apply_year']
+    res_df[cols].to_csv('../data/patent_author_rela.csv', index=False)
 
 
 def _paper_patent_author_merge():
@@ -231,12 +231,16 @@ def _paper_patent_author_merge():
 
     author_df['author_id'] = (author_df.index + 1).astype(str).str.zfill(8)
     print(author_df.columns)
-    author_df[['author_id', 'author_name']].to_csv('../data/merge_author_id.csv', index=False)
+    author_df[['author_id', 'author_name']].to_csv('../data/author_id.csv', index=False)
 
 
 if __name__ == '__main__':
-    # _paper_process_()
-    # _paper_author_split()
-    # _patent_process_()
-    # _patent_author_split()
-    _paper_patent_author_merge()
+    _paper_process_()   # format key_word
+    _patent_process_()  # format key_word
+
+    _paper_patent_author_merge()  # merge author  author_id
+
+    _paper_author_split()   # paper author rela
+
+    _patent_author_split()  # patent author rela
+
