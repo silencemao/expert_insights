@@ -62,8 +62,8 @@ def _patent_score(patent_df):
     patent_score = []
     for ind, row in patent_df.iterrows():
 
-        base_score = patent_type_cfg[row['patent_type']][0]
-        divid_score = patent_type_cfg[row['patent_type']][1]
+        base_score = patent_type_cfg[row['patent_type']][1][0]
+        divid_score = patent_type_cfg[row['patent_type']][1][1]
 
         # print('base_score ', base_score, divid_score)
         finish_order, max_order = row['finish_order'], row['max_order']
@@ -132,12 +132,18 @@ def _calculate_score():
                                .merge(book_sum_df, on=['id', 'finish_year'], how='left')\
                                .merge(paper_sum_df, on=['id', 'finish_year'], how='left')
 
+    # 可以配置权重
     res_df['sum_score'] = res_df['edu_score'] + res_df['after_senior_score'] + res_df['reward_score'] \
                           + res_df['patent_score'] + res_df['book_score'] + res_df['paper_score']
 
     res_df = res_df.sort_values(by=['finish_year', 'sum_score'], ascending=[False, False])
     print(res_df)
     print(res_df.columns)
+
+    res_df = res_df.groupby(['id', 'name']).agg(sum_score=('sum_score', 'sum')).reset_index()
+    res_df = res_df.sort_values(by=['sum_score'], ascending=False)
+    res_df['rank'] = res_df.reset_index().index + 1
+    print(res_df)
 
 
 if __name__ == '__main__':
