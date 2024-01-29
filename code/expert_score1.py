@@ -127,8 +127,6 @@ def _calculate_score():
     book_sum_df = book_score_df.groupby(['id', 'finish_year']).agg(book_score=('book_score', 'sum')).reset_index()
     paper_sum_df = paper_score_df.groupby(['id', 'finish_year']).agg(paper_score=('paper_score', 'sum')).reset_index()
 
-    print(paper_sum_df, paper_sum_df.columns)
-
     res_df = user_base_score_df.merge(reward_sum_df, on=['id'], how='left')\
                                .merge(patent_sum_df, on=['id', 'finish_year'], how='left')\
                                .merge(book_sum_df, on=['id', 'finish_year'], how='left')\
