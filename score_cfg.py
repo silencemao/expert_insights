@@ -70,3 +70,7 @@ standard_cfg = {
     5: [160, 80]    # 地标
 }
 
+score_weight = {
+    'base_score': 0.1, 'after_senior_score': 0.1, 'reward_score': 0.3, 'patent_score': 0.25, 'book_and_paper': 0.25
+}
+
