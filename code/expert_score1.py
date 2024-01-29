@@ -1,6 +1,8 @@
 import pandas as pd
 import math
-from score_cfg import reward_type_cfg, patent_type_cfg, paper_type_cfg, book_type_cfg
+
+import score_cfg
+from score_cfg import reward_type_cfg, patent_type_cfg, paper_type_cfg, book_type_cfg, score_weight
 pd.set_option('display.max_columns', None)
 
 
@@ -35,7 +37,7 @@ def _user_base_score(user_base_df):
 def _score_func(finish_order, max_order, base_score, divid_score):
     if max_order == 1:
         return 1
-    return round(base_score / (math.pow(base_score / divid_score, 1/(max_order-1)) ** (finish_order-1)), 3)
+    return round(base_score / (math.pow(base_score / divid_score, 1/(max_order-1)) ** (finish_order-1)), 2)
 
 
 def _reward_score(reward_df):
@@ -133,8 +135,10 @@ def _calculate_score():
                                .merge(paper_sum_df, on=['id', 'finish_year'], how='left')
 
     # 可以配置权重
-    res_df['sum_score'] = res_df['edu_score'] + res_df['after_senior_score'] + res_df['reward_score'] \
-                          + res_df['patent_score'] + res_df['book_score'] + res_df['paper_score']
+    edu_weight, senior_weight, reward_weight, patent_weight, book_and_paper_weight = score_weight['base_score'], score_weight['after_senior_score'], score_weight['reward_score'], score_weight['patent_score'], score_weight['book_and_paper']
+    res_df['sum_score'] = res_df['edu_score'] * edu_weight + res_df['after_senior_score'] * senior_weight + \
+                          res_df['reward_score'] * reward_weight + res_df['patent_score'] * patent_weight \
+                          + (res_df['book_score'] + res_df['paper_score']) * book_and_paper_weight
 
     res_df = res_df.sort_values(by=['finish_year', 'sum_score'], ascending=[False, False])
     print(res_df)
