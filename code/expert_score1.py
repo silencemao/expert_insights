@@ -134,7 +134,6 @@ def _calculate_score():
                                .merge(book_sum_df, on=['id', 'finish_year'], how='left')\
                                .merge(paper_sum_df, on=['id', 'finish_year'], how='left')
 
-    # 可以配置权重
     edu_weight, senior_weight, reward_weight, patent_weight, book_and_paper_weight = score_weight['base_score'], score_weight['after_senior_score'], score_weight['reward_score'], score_weight['patent_score'], score_weight['book_and_paper']
     res_df['sum_score'] = res_df['edu_score'] * edu_weight + res_df['after_senior_score'] * senior_weight + \
                           res_df['reward_score'] * reward_weight + res_df['patent_score'] * patent_weight \
