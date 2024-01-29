@@ -2,7 +2,7 @@ import pandas as pd
 import math
 
 import score_cfg
-from score_cfg import reward_type_cfg, patent_type_cfg, paper_type_cfg, book_type_cfg, score_weight
+from score_cfg import reward_type_cfg, patent_type_cfg, paper_type_cfg, book_type_cfg, score_weight, edu_config
 pd.set_option('display.max_columns', None)
 
 
@@ -18,7 +18,6 @@ def _read_data():
 
 
 def _user_base_score(user_base_df):
-    edu_config = {0: 300, 1: 210, 2: 160}
     user_base_df['edu_score'] = user_base_df['edu_background'].apply(lambda x: edu_config[x])
 
     def _after_senior_score(x):
