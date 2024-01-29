@@ -101,6 +101,32 @@ def generate_book_info():
     book_df.to_csv('../data/base_info/book_info.csv', index=False)
 
 
+def generate_standard_info():
+    '''
+    人资编码	姓名	标准名称	级别(0国际标准、1国家标准、2行标、3团标、4企标、5地标)		完成人排序（从1开始计数）	完成年份
+    :return:
+    '''
+    user_num = user_base_df['id']
+    years = ['2019', '2020', '2021', '2022', '2023']
+    standards = {'id': [], 'standard_name': [], 'standard_class': [], 'finish_order': [], 'max_order': [], 'finish_year': []}
+
+    for year in years:
+        for user in user_num:
+            standards['id'].append(user)
+            standards['standard_name'].append(generate_random_chinese(random.randint(8, 16)))
+            standards['standard_class'].append(random.randint(0, 5))
+
+            finish_order = random.randint(1, 8)
+            standards['finish_order'].append(finish_order)
+            standards['max_order'].append(random.randint(min(finish_order, min(finish_order+1, 8)), 8))
+
+            standards['finish_year'].append(year)
+
+    paper_df = pd.DataFrame(standards)
+    print(paper_df)
+    paper_df.to_csv('../data/base_info/standard_info.csv', index=False)
+
+
 def generate_paper_info():
     # 姓名	论文名称	收录类型(0SCI、1EI、2其它)	完成人排序(从1开始）	完成年份
     user_num = user_base_df['id']
@@ -130,6 +156,7 @@ if __name__ == '__main__':
     generate_patent_info()
     generate_book_info()
     generate_paper_info()
+    generate_standard_info()
 
 
 
